@@ -5,6 +5,8 @@ import ar.edu.uns.cs.ed.tdas.excepciones.EmptyStackException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.tdas.tdapila.PilaConArreglo;
+import ar.edu.uns.cs.ed.tdas.tdapila.Stack;
 import ar.edu.uns.cs.ed.tdas.tdaarbol.Arbol;
 /**
  * Incluir los import necesarios para las clases utilizadas en el código.
@@ -20,6 +22,7 @@ public class MotorDeliberacion {
      * Incluir los atributos necesarios para el desarrollo.
      */
     protected Tree<Opinion> arbol;
+    protected Stack<Operaciones> pilaOperaciones;
 
     /**
      * Constructor de la clase MotorDeliveracion.
@@ -29,6 +32,8 @@ public class MotorDeliberacion {
     public MotorDeliberacion() {
         //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
         arbol= new Arbol<Opinion>();
+        pilaOperaciones = new PilaConArreglo<Operaciones>();
+
     }
 
     /**
@@ -75,14 +80,17 @@ public class MotorDeliberacion {
  */
     public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) {
     //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
-        if(idRaiz==null||texto==null||idUsuario==null||nombreUsuario==null)
+        if(idRaiz==null||idRaiz.trim().isEmpty()||texto==null||texto.trim().isEmpty()||idUsuario==null||idUsuario.trim().isEmpty()||nombreUsuario==null||nombreUsuario.trim().isEmpty())
             throw new IllegalArgumentException("datos ingresados invalidos");
         if(!arbol.isEmpty())
             throw new IllegalStateException("Ya existe un debate en curso");
-        
+        if (!idRaiz.matches("[0-9]+")) 
+            throw new IllegalArgumentException("El ID de la raíz debe ser numérico");        
         Usuario usuario1= new Usuario(idUsuario,nombreUsuario);
         Opinion raiz= new Opinion(idRaiz,texto,"ROOT",usuario1);
         arbol.createRoot(raiz);
+        Operaciones op= new Operaciones(1, "CREAR_DEBATE:"+idRaiz, idRaiz);
+        pilaOperaciones.push(op);
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
