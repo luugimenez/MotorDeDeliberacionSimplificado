@@ -54,7 +54,9 @@ public class MotorDeliberacion {
  * @throws EmptyStackException
  */
     public String deshacerUltimaOperacion() throws EmptyStackException {
+        String toret=null;
         //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
+        return toret;
     }
 /**
  * Crea un nuevo debate con un argumento raíz.

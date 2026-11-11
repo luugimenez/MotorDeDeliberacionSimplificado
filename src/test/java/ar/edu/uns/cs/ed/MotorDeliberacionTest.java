@@ -42,7 +42,7 @@ public class MotorDeliberacionTest {
 
     @Before
     public void setUp() {
-        motor = new MotorDeliveracion();
+        motor = new MotorDeliberacion();
         construirArbolCompleto();
     }
 
@@ -108,7 +108,7 @@ public class MotorDeliberacionTest {
 
     @Test
     public void crearDebate_registraAlCreadorEnElIndicePorUsuario() {
-        MotorDeliveracion m = new MotorDeliveracion();
+        MotorDeliberacion m = new MotorDeliberacion();
         m.crearDebate("d1", "tema", "usr9", "usr9");
         PositionList<Opinion> res = m.consultarArgumentosPorUsuario("usr9");
         assertEquals(1, res.size());
@@ -117,17 +117,17 @@ public class MotorDeliberacionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_idVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate(" ", "texto", "usr1", "usr1");
+        new MotorDeliberacion().crearDebate(" ", "texto", "usr1", "usr1");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_textoVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate("d1", "", "usr1", "usr1");
+        new MotorDeliberacion().crearDebate("d1", "", "usr1", "usr1");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_usuarioVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate("d1", "texto", " ", "usr1");
+        new MotorDeliberacion().crearDebate("d1", "texto", " ", "usr1");
     }
 
     @Test(expected = IllegalStateException.class)
@@ -178,7 +178,7 @@ public class MotorDeliberacionTest {
 
     @Test(expected = IllegalStateException.class)
     public void postear_sinDebateCreado_lanzaExcepcion() {
-        new MotorDeliveracion().Postear(usr1, "posteoX", "debate1", "AFAVOR", "texto");
+        new MotorDeliberacion().Postear(usr1, "posteoX", "debate1", "AFAVOR", "texto");
     }
 
     // ---------------------- eliminarPosteo ----------------------
@@ -341,7 +341,7 @@ public class MotorDeliberacionTest {
 
     @Test(expected = EmptyStackException.class)
     public void deshacer_sinOperaciones_lanzaExcepcion() throws Exception {
-        new MotorDeliveracion().deshacerUltimaOperacion();
+        new MotorDeliberacion().deshacerUltimaOperacion();
     }
 
     @Test
@@ -375,7 +375,7 @@ public class MotorDeliberacionTest {
     //@Ignore("Bug: clearDebate() vacía la pila y luego top() lanza EmptyStackException")
     @Test
     public void deshacer_crearDebate_limpiaElDebate() throws Exception {
-        MotorDeliveracion m = new MotorDeliveracion();
+        MotorDeliberacion m = new MotorDeliberacion();
         m.crearDebate("d1", "tema", "usr1", "usr1");
         m.deshacerUltimaOperacion();
         try {
