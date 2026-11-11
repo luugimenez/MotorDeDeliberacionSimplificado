@@ -5,6 +5,8 @@ import ar.edu.uns.cs.ed.tdas.excepciones.EmptyStackException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.tdas.tdamapeo.Map;
+import ar.edu.uns.cs.ed.tdas.tdamapeo.Mapeo;
 import ar.edu.uns.cs.ed.tdas.tdapila.PilaConArreglo;
 import ar.edu.uns.cs.ed.tdas.tdapila.Stack;
 import ar.edu.uns.cs.ed.tdas.tdaarbol.Arbol;
@@ -23,6 +25,8 @@ public class MotorDeliberacion {
      */
     protected Tree<Opinion> arbol;
     protected Stack<Operaciones> pilaOperaciones;
+    protected Map<String, Position<Opinion>> opinionesPorId;
+    protected Map<String, PositionList<Opinion>> opinionesPorUsuario;
 
     /**
      * Constructor de la clase MotorDeliveracion.
@@ -33,7 +37,8 @@ public class MotorDeliberacion {
         //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
         arbol= new Arbol<Opinion>();
         pilaOperaciones = new PilaConArreglo<Operaciones>();
-
+        opinionesPorId = new Mapeo<String, Position<Opinion>>();
+        opinionesPorUsuario = new Mapeo<String, PositionList<Opinion>>();
     }
 
     /**
@@ -95,6 +100,41 @@ public class MotorDeliberacion {
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
         //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
+        if (arbol.isEmpty()) {
+            throw new IllegalStateException("No hay debate en curso. Cree un debate primero.");
+        }
+        if (usr == null || idNuevo == null || idNuevo.trim().isEmpty() || idPadre == null || idPadre.trim().isEmpty()
+            || postura == null || postura.trim().isEmpty() || texto == null || texto.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Los datos ingresados son inválidos.");
+        }
+        String nuevo = idNuevo.trim();
+        String padreId = idPadre.trim();
+        String post = postura.trim().toUpperCase(java.util.Locale.ROOT);
+        if(!post.equals("AFAVOR") && post.equals("ENCONTRA")) {
+            throw new IllegalArgumentException("La postura debe ser 'AFAVOR' o 'ENCONTRA'.");
+        }
+        if(opinionesPorId.get(nuevo) != null) {
+            throw new IllegalArgumentException("Ya existe un argumento con el ID: " + nuevo);
+        }
+        Position<Opinion> Padre = opinionesPorId.get(padreId);
+        if (Padre == null) {
+            throw new IllegalArgumentException("No existe un argumento con el ID del padre: " + padreId);
+        }
+        
+        Opinion opinion = new Opinion(nuevo, texto, post, usr);
+        Position<Opinion> posicion = arbol.addLastChild(Padre, opinion);
+
+        opinionesPorId.put(nuevo, posicion);
+
+        PositionList<Opinion> delUsuario = opinionesPorUsuario.get(usr.getId());
+        if (delUsuario == null) {
+            delUsuario = new ListaDoblementeEnlazada<Opinion>();
+            opinionesPorUsuario.put(usr.getId(), delUsuario);
+        }
+        delUsuario.addLast(opinion);
+
+        registrarOperacion(2, "POSTEAR:" + nuevo, nuevo);
     }
     
 
