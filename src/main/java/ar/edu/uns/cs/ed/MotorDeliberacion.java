@@ -1,7 +1,10 @@
 package ar.edu.uns.cs.ed;
 
-import main.java.ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
-import main.java.ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.tdas.Position;
+import ar.edu.uns.cs.ed.tdas.excepciones.EmptyStackException;
+import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
+import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
+import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
 
 /**
  * Incluir los import necesarios para las clases utilizadas en el código.
@@ -23,7 +26,8 @@ public class MotorDeliberacion {
      * 
      */
     public MotorDeliberacion() {
-    //TODO: Inicializar el árbol de debate y las estructuras correspondientes. 
+        
+        //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
     }
 
     /**
@@ -40,6 +44,7 @@ public class MotorDeliberacion {
      */
     public void registrarOperacion(int operacion, String detalle, String idArgumento) {
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
+
     }
 
 /**
