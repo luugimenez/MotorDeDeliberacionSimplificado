@@ -35,10 +35,10 @@ public class MotorDeliberacion {
      */
     public MotorDeliberacion() {
         //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
-        arbol= new Arbol<>();
-        pilaOperaciones = new PilaConArreglo<>();
-        opinionesPorId = new Mapeo<>();
-        opinionesPorUsuario = new Mapeo<>();
+        arbol= new Arbol<Opinion>();
+        pilaOperaciones = new PilaConArreglo<Operaciones>();
+        opinionesPorId = new Mapeo<String,Position<Opinion>>();
+        opinionesPorUsuario = new Mapeo<String,PositionList<Opinion>>();
     }
 
     /**
@@ -94,6 +94,10 @@ public class MotorDeliberacion {
         Usuario usuario1= new Usuario(idUsuario,nombreUsuario);
         Opinion raiz= new Opinion(idRaiz,texto,"ROOT",usuario1);
         arbol.createRoot(raiz);
+        opinionesPorId.put(idRaiz,arbol.root());
+        PositionList<Opinion> lista= new ListaDoblementeEnlazada<Opinion>();
+        lista.addLast(raiz);
+        opinionesPorUsuario.put(idUsuario,lista);
         Operaciones op= new Operaciones(1, "CREAR_DEBATE:"+idRaiz, idRaiz);
         pilaOperaciones.push(op);
     }
