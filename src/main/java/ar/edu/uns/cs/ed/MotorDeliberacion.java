@@ -144,7 +144,7 @@ public class MotorDeliberacion {
     }
 
     //obtiene las posiciones en postorden.
-    private void obtenerIdsYPosicionesSubarbol(Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
+    private void obtenerIdsYPosicionesSubarbol (Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
     //TODO: Implementar la funcionalidad de obtener los ids y posiciones de un subárbol en postorden.
     }
 
@@ -204,7 +204,7 @@ public class MotorDeliberacion {
         }
     }
 
-/** Arma la línea de texto que representa a un Argumento en la impresión. */
+ /** Arma la línea de texto que representa a un Argumento en la impresión. */
     private String formatearNodo(Opinion a) {
         if (a == null) {
             return "(argumento nulo)";
@@ -212,6 +212,26 @@ public class MotorDeliberacion {
         return "[" + a.getIdArgumento() + "] (" + a.getPostura() + ") "
                 + "usuario=" + a.getUsuario().getId() + " -> " + a.getTexto();
     }
+ 
+    public int[] polarizacionDeNodo(Position<Opinion> polarizante){
+        int [] record= new int[2];
+        verificarOpinion(arbol.children(polarizante), record);
+        return record;
+    }
+    
+    private void verificarOpinion(Iterable<Position<Opinion>> hijos, int[] record){
+        for(Position<Opinion> PosOp : hijos){
+            Opinion op= PosOp.element();
+            //visita
+            if(op.getPostura().equals("A FAVOR")){
+                record[0]+=1;
+            } else if(op.getPostura().equals("EN CONTRA")){
+                record[1]+=1;
+            }
+            verificarOpinion(arbol.children(PosOp), record);
+        }
+    }
+
 }
 
 
