@@ -160,6 +160,9 @@ public class MotorDeliberacion {
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
+        if(idUsuario==null||idUsuario.trim().isEmpty())
+            throw new IllegalArgumentException("Id de usuario invalido");
+        return opinionesPorUsuario.get(idUsuario);
     }
 
  /*** Mostrar árbol por consola ***/
