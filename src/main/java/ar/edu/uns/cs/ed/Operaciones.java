@@ -9,4 +9,16 @@ public class Operaciones {
         this.detalle=detalle;
         this.id=id;
     }
+
+    public int getOperacion(){
+        return operacion;
+    }
+
+    public String getDetalle(){
+        return detalle;
+    }
+
+    public String getId(){
+        return id;
+    }
 }

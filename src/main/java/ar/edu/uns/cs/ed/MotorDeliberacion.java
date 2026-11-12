@@ -65,9 +65,23 @@ public class MotorDeliberacion {
  * @throws EmptyStackException
  */
     public String deshacerUltimaOperacion() throws EmptyStackException {
-        String toret=null;
+        if(pilaOperaciones.isEmpty())
+            throw new IllegalStateException("No hay operaciones para deshacer");
+        
         //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
-        return toret;
+        Operaciones ultima= pilaOperaciones.top();
+        if(ultima.getOperacion()==1){
+            clearDebate();
+            pilaOperaciones.pop();
+        }
+        else{
+            if(ultima.getOperacion()==2){
+                //tengo que pasarle los valores por parametro
+                eliminarPosteo(null, null);
+                pilaOperaciones.pop();
+            }
+        }
+        return null;
     }
 /**
  * Crea un nuevo debate con un argumento raíz.
@@ -155,6 +169,13 @@ public class MotorDeliberacion {
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
+
+    //este codigo es solo para un arbol con nodo raiz, tengo que modificar un caso general
+        String idArgumento= (arbol.root()).element().getIdArgumento();
+        opinionesPorId.remove(idArgumento);
+        String idUsuario= (arbol.root()).element().getUsuario().getId();
+        opinionesPorUsuario.remove(idUsuario);
+        arbol.removeNode(arbol.root());
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
