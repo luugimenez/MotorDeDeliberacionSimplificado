@@ -35,10 +35,10 @@ public class MotorDeliberacion {
      */
     public MotorDeliberacion() {
         //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
-        arbol= new Arbol<Opinion>();
-        pilaOperaciones = new PilaConArreglo<Operaciones>();
-        opinionesPorId = new Mapeo<String, Position<Opinion>>();
-        opinionesPorUsuario = new Mapeo<String, PositionList<Opinion>>();
+        arbol= new Arbol<>();
+        pilaOperaciones = new PilaConArreglo<>();
+        opinionesPorId = new Mapeo<>();
+        opinionesPorUsuario = new Mapeo<>();
     }
 
     /**
@@ -232,6 +232,34 @@ public class MotorDeliberacion {
         }
     }
 
+    public PositionList<String[]> contabilizarTodaPolarizacion(){
+        PositionList<String[]> ListaRecords = new ListaDoblementeEnlazada<>();
+        if(arbol.root()!=null){
+            contabilizarPolarizacion(arbol.root(), ListaRecords);
+        }
+        return ListaRecords;
+    }
+
+    private void contabilizarPolarizacion(Position<Opinion> nodo, PositionList<String[]> list){
+        Opinion actual= nodo.element();
+        String[] record= new String[3];
+        record[0]= actual.getIdArgumento();
+        int aFvor=0;
+        int enContra=0;
+        for(Position<Opinion> posOp: arbol.children(nodo)){
+            contabilizarPolarizacion(posOp, list);
+            Opinion op= posOp.element();
+            if(op.getPostura().equals("A FAVOR")){
+                aFvor++;
+            }
+            if(op.getPostura().equals("EN CONTRA")){
+                enContra++;
+            }
+        }
+        record[1] = String.valueOf(aFvor);
+        
+        list.addLast(record);
+    }
 }
 
 
