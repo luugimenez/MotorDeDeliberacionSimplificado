@@ -73,29 +73,23 @@ public class MotorDeliberacion {
     public String deshacerUltimaOperacion() throws EmptyStackException {
         if(pilaOperaciones.isEmpty())
             throw new EmptyStackException("No hay operaciones para deshacer");
-        
-        //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
-        String toRet=null;
         Operaciones ultima= pilaOperaciones.top();
         if(ultima.getOperacion()==1){
             clearDebate();
+            return "Se deshizo la creación del debate.";
+        }
+        if(ultima.getOperacion()==2){
+            String idArgumento=ultima.getId();
+            Position<Opinion> pos = opinionesPorId.get(idArgumento);
+            if (pos == null) {
+                throw new IllegalStateException("No se pudo deshacer la operación POSTEAR: el posteo ya no existe.");
+            }
+            String idUsuario = pos.element().getUsuario().getId();
+            eliminarSubArbol(pos, idUsuario, idArgumento);
             pilaOperaciones.pop();
-            toRet="Se deshizo la creación del debate.";
+            return "Se deshizo la publicación del posteo " + idArgumento + ".";
         }
-        else{
-            if(ultima.getOperacion()==2){
-                String idArgumento=ultima.getId();
-                Position<Opinion> pos = opinionesPorId.get(idArgumento);
-                String idUsuario = pos.element().getUsuario().getId();
-                eliminarPosteo(idUsuario, idArgumento);
-                pilaOperaciones.pop();
-                toRet="Se deshizo la publicación del posteo " + idArgumento + ".";
-            }
-            else{
-                toRet="Error: no puede recuperar el posteo eliminado";
-            }
-        }
-        return toRet;
+        throw new IllegalStateException("No se pudo deshacer la operación POSTEAR.");
     }
 /**
  * Crea un nuevo debate con un argumento raíz.
@@ -112,13 +106,10 @@ public class MotorDeliberacion {
  * Crea un usuario y un tema raíz, y los agrega al árbol y a las estructuras correspondientes.
  */
     public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) {
-    //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
         if(idRaiz==null||idRaiz.trim().isEmpty()||texto==null||texto.trim().isEmpty()||idUsuario==null||idUsuario.trim().isEmpty()||nombreUsuario==null||nombreUsuario.trim().isEmpty())
             throw new IllegalArgumentException("datos ingresados invalidos");
         if(!arbol.isEmpty())
             throw new IllegalStateException("Ya existe un debate en curso");
-        if (!idRaiz.trim().matches("[0-9]+")) 
-            throw new IllegalArgumentException("El ID de la raíz debe ser numérico");        
         Usuario usuario1= new Usuario(idUsuario.trim(),nombreUsuario.trim());
         Opinion raiz= new Opinion(idRaiz.trim(),texto,"ROOT",usuario1);
         arbol.createRoot(raiz);
@@ -130,7 +121,6 @@ public class MotorDeliberacion {
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
-        //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
         if (arbol.isEmpty()) {
             throw new IllegalStateException("No hay debate en curso. Cree un debate primero.");
         }
@@ -142,7 +132,7 @@ public class MotorDeliberacion {
         String nuevo = idNuevo.trim();
         String padreId = idPadre.trim();
         String post = postura.trim().toUpperCase(java.util.Locale.ROOT);
-        if(!post.equals("AFAVOR") && post.equals("ENCONTRA")) {
+        if(!post.equals("AFAVOR") && !post.equals("ENCONTRA")) {
             throw new IllegalArgumentException("La postura debe ser 'AFAVOR' o 'ENCONTRA'.");
         }
         if(opinionesPorId.get(nuevo) != null) {
@@ -171,17 +161,21 @@ public class MotorDeliberacion {
 
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
-    //TODO: Implementar la funcionalidad de eliminar un posteo y todo su subárbol en el debate.
         if (idUsuario == null || idUsuario.trim().isEmpty() || idPosteo == null || idPosteo.trim().isEmpty()) 
         throw new IllegalArgumentException("Los datos ingresados son inválidos.");
     
-        Position<Opinion> posAEliminar= opinionesPorId.get(idPosteo);
+        String idObjetivo = idPosteo.trim();
+        Position<Opinion> posAEliminar= opinionesPorId.get(idObjetivo);
 
         if (posAEliminar == null) 
             throw new IllegalArgumentException("No existe el posteo indicado.");
 
-        eliminarSubArbol(posAEliminar,idUsuario,idPosteo);
-        registrarOperacion(3, "ELIMINAR_POSTEO:" + idPosteo, idPosteo);
+        if (!posAEliminar.element().getUsuario().getId().equals(idUsuario.trim())) {
+            throw new IllegalStateException("El usuario no es propietario del posteo.");
+        }
+
+        eliminarSubArbol(posAEliminar, idUsuario.trim(), idObjetivo);
+        registrarOperacion(3, "ELIMINAR_POSTEO:" + idObjetivo, idObjetivo);
     }
 
     private void eliminarSubArbol(Position<Opinion> posEliminada, String idUsuario, String idPosteo){
@@ -205,24 +199,23 @@ public class MotorDeliberacion {
 
     //obtiene las posiciones en postorden.
     private void obtenerIdsYPosicionesSubarbol (Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
-    //TODO: Implementar la funcionalidad de obtener los ids y posiciones de un subárbol en postorden.
+        for(Position<Opinion> hijo: arbol.children(nodo)){
+            obtenerIdsYPosicionesSubarbol(hijo, ids, posiciones);
+        }
+        ids.addLast(nodo.element().getIdArgumento());
+        posiciones.addLast(nodo);
     }
 
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
-    //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
-        if(!arbol.isEmpty()){
-            Opinion raiz= arbol.root().element();
-            String idArgumento= raiz.getIdArgumento();
-            String idUsuario= raiz.getUsuario().getId();
-            eliminarPosteo(idUsuario, idArgumento);
-            
-        }
+        arbol = new Arbol<Opinion>();
+        opinionesPorId = new Mapeo<String,Position<Opinion>>();
+        opinionesPorUsuario = new Mapeo<String,PositionList<Opinion>>();
+        pilaOperaciones = new PilaConArreglo<Operaciones>();
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
-    //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
         if(idUsuario == null || idUsuario.trim().isEmpty())
             throw new IllegalArgumentException("Id de usuario invalido");
         if(opinionesPorUsuario.get(idUsuario.trim()) == null)
