@@ -103,16 +103,16 @@ public class MotorDeliberacion {
             throw new IllegalArgumentException("datos ingresados invalidos");
         if(!arbol.isEmpty())
             throw new IllegalStateException("Ya existe un debate en curso");
-        if (!idRaiz.matches("[0-9]+")) 
+        if (!idRaiz.trim().matches("[0-9]+")) 
             throw new IllegalArgumentException("El ID de la raíz debe ser numérico");        
-        Usuario usuario1= new Usuario(idUsuario,nombreUsuario);
-        Opinion raiz= new Opinion(idRaiz,texto,"ROOT",usuario1);
+        Usuario usuario1= new Usuario(idUsuario.trim(),nombreUsuario.trim());
+        Opinion raiz= new Opinion(idRaiz.trim(),texto,"ROOT",usuario1);
         arbol.createRoot(raiz);
-        opinionesPorId.put(idRaiz,arbol.root());
+        opinionesPorId.put(idRaiz.trim(),arbol.root());
         PositionList<Opinion> lista= new ListaDoblementeEnlazada<Opinion>();
         lista.addLast(raiz);
-        opinionesPorUsuario.put(idUsuario,lista);
-        Operaciones op= new Operaciones(1, "CREAR_DEBATE:"+idRaiz, idRaiz);
+        opinionesPorUsuario.put(idUsuario.trim(),lista);
+        Operaciones op= new Operaciones(1, "CREAR_DEBATE:"+idRaiz.trim(), idRaiz.trim());
         pilaOperaciones.push(op);
     }
 
@@ -169,21 +169,31 @@ public class MotorDeliberacion {
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
+        arbol = new Arbol<Opinion>();
+        opinionesPorId = new Mapeo<String, Position<Opinion>>();
+        opinionesPorUsuario = new Mapeo<String, PositionList<Opinion>>();
 
+        while(!pilaOperaciones.isEmpty()) {
+            pilaOperaciones.pop();
+        }
+    /*
     //este codigo es solo para un arbol con nodo raiz, tengo que modificar un caso general
         String idArgumento= (arbol.root()).element().getIdArgumento();
         opinionesPorId.remove(idArgumento);
         String idUsuario= (arbol.root()).element().getUsuario().getId();
         opinionesPorUsuario.remove(idUsuario);
         arbol.removeNode(arbol.root());
+    */
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-        if(idUsuario==null||idUsuario.trim().isEmpty())
+        if(idUsuario == null || idUsuario.trim().isEmpty())
             throw new IllegalArgumentException("Id de usuario invalido");
-        return opinionesPorUsuario.get(idUsuario);
+        if(opinionesPorUsuario.get(idUsuario.trim()) == null)
+            return new ListaDoblementeEnlazada<Opinion>();
+        return opinionesPorUsuario.get(idUsuario.trim());
     }
 
  /*** Mostrar árbol por consola ***/
