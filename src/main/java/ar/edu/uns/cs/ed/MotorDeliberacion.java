@@ -55,7 +55,17 @@ public class MotorDeliberacion {
      */
     public void registrarOperacion(int operacion, String detalle, String idArgumento) {
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
+        if(operacion != 1 && operacion != 2) {
+            throw new IllegalArgumentException("Operación inválida. Solo se permiten CREAR_DEBATE (1) y POSTEAR (2).");
+        }
+        if(detalle == null || detalle.trim().isEmpty()) {
+            throw new IllegalArgumentException("Detalle de la operación inválido.");
+        }
+        if(idArgumento == null || idArgumento.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID de argumento inválido.");
+        }
 
+        pilaOperaciones.push(new Operaciones(operacion, detalle.trim(), idArgumento.trim()));
     }
 
 /**
@@ -65,21 +75,19 @@ public class MotorDeliberacion {
  * @throws EmptyStackException
  */
     public String deshacerUltimaOperacion() throws EmptyStackException {
-        if(pilaOperaciones.isEmpty())
-            throw new IllegalStateException("No hay operaciones para deshacer");
-        
         //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
-        Operaciones ultima= pilaOperaciones.top();
-        if(ultima.getOperacion()==1){
-            clearDebate();
+        Operaciones ultima = pilaOperaciones.top();
+        String detalle = ultima.getDetalle();
+        if(ultima.getOperacion() == 1){
             pilaOperaciones.pop();
+            clearDebate();
+            return detalle;
         }
-        else{
-            if(ultima.getOperacion()==2){
-                //tengo que pasarle los valores por parametro
-                eliminarPosteo(null, null);
-                pilaOperaciones.pop();
-            }
+        if(ultima.getOperacion() == 2){
+            
+            //tengo que pasarle los valores por parametro
+            eliminarPosteo(null, null);
+            pilaOperaciones.pop();
         }
         return null;
     }
@@ -112,8 +120,7 @@ public class MotorDeliberacion {
         PositionList<Opinion> lista= new ListaDoblementeEnlazada<Opinion>();
         lista.addLast(raiz);
         opinionesPorUsuario.put(idUsuario.trim(),lista);
-        Operaciones op= new Operaciones(1, "CREAR_DEBATE:"+idRaiz.trim(), idRaiz.trim());
-        pilaOperaciones.push(op);
+        registrarOperacion(1, "CREAR_DEBATE:" + idRaiz.trim(), idRaiz.trim());
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
