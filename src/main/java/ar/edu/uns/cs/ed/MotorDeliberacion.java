@@ -322,6 +322,7 @@ public class MotorDeliberacion {
             }
         }
         record[1] = String.valueOf(aFvor);
+        record[2] = String.valueOf(enContra);
         
         list.addLast(record);
     }
