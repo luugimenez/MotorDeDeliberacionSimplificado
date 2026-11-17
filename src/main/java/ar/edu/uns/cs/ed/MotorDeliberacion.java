@@ -14,6 +14,8 @@ import ar.edu.uns.cs.ed.tdas.tdaarbol.Arbol;
  * Incluir los import necesarios para las clases utilizadas en el código.
  */
 import ar.edu.uns.cs.ed.tdas.tdaarbol.Tree;
+import ar.edu.uns.cs.ed.tdas.tdadiccionario.Diccionario;
+import java.util.Dictionary;
 /**
  * Clase que representa el motor de deliveración.
  * 
@@ -278,53 +280,47 @@ public class MotorDeliberacion {
                 + "usuario=" + a.getUsuario().getId() + " -> " + a.getTexto();
     }
  
-    public int[] polarizacionDeNodo(Position<Opinion> polarizante){
-        int [] record= new int[2];
-        verificarOpinion(arbol.children(polarizante), record);
+    public Diccionario<String,Integer> calcularPolarizacionNodo(String idNodo) throws IllegalStateException{
+        Diccionario<String, Integer> record= new Diccionario<String, Integer>();
+        if(arbol.isEmpty()){
+            throw new IllegalStateException("No hay debate activo");
+        }
+        record.insert("A FAVOR", 0);
+        record.insert("EN CONTRA", 0);
+        Position<Opinion> SubRaiz= opinionesPorId.get(idNodo);
+        verificarOpinion(arbol.children(SubRaiz), record);
         return record;
-    }
+    } 
     
-    private void verificarOpinion(Iterable<Position<Opinion>> hijos, int[] record){
+    private void verificarOpinion(Iterable<Position<Opinion>> hijos, Diccionario<String,Integer> record){
+        Integer cont;
         for(Position<Opinion> PosOp : hijos){
             Opinion op= PosOp.element();
             //visita
-            if(op.getPostura().equals("A FAVOR")){
-                record[0]+=1;
-            } else if(op.getPostura().equals("EN CONTRA")){
-                record[1]+=1;
+            if(record.find(op.getPostura()) != null){
+                cont= record.find(op.getPostura()).getValue();
+                record.insert(op.getPostura(), cont + 1 );
             }
             verificarOpinion(arbol.children(PosOp), record);
         }
     }
 
-    public PositionList<String[]> contabilizarTodaPolarizacion(){
-        PositionList<String[]> ListaRecords = new ListaDoblementeEnlazada<>();
+    public Diccionario<String,Diccionario<String,Integer>> calcularPolarizacionDebate() throws IllegalStateException {
+        Diccionario<String,Diccionario<String,Integer>> dicRecords = new Diccionario<>();
         if(arbol.root()!=null){
-            contabilizarPolarizacion(arbol.root(), ListaRecords);
+            contabilizarPolarizacion(arbol.root(), dicRecords);
         }
-        return ListaRecords;
+        return dicRecords; 
     }
 
-    private void contabilizarPolarizacion(Position<Opinion> nodo, PositionList<String[]> list){
+    private void contabilizarPolarizacion(Position<Opinion> nodo, Diccionario<String,Diccionario<String,Integer>> dic) {
         Opinion actual= nodo.element();
-        String[] record= new String[3];
-        record[0]= actual.getIdArgumento();
-        int aFvor=0;
-        int enContra=0;
         for(Position<Opinion> posOp: arbol.children(nodo)){
-            contabilizarPolarizacion(posOp, list);
-            Opinion op= posOp.element();
-            if(op.getPostura().equals("A FAVOR")){
-                aFvor++;
-            }
-            if(op.getPostura().equals("EN CONTRA")){
-                enContra++;
-            }
+            contabilizarPolarizacion(posOp, dic);
+           //visita
+           dic.insert(actual.getIdArgumento(), calcularPolarizacionNodo(actual.getIdArgumento()));
         }
-        record[1] = String.valueOf(aFvor);
-        record[2] = String.valueOf(enContra);
-        
-        list.addLast(record);
+      
     }
 }
 
