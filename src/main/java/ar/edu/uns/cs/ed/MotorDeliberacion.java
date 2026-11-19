@@ -15,7 +15,6 @@ import ar.edu.uns.cs.ed.tdas.tdaarbol.Arbol;
  */
 import ar.edu.uns.cs.ed.tdas.tdaarbol.Tree;
 import ar.edu.uns.cs.ed.tdas.tdadiccionario.Diccionario;
-import java.util.Dictionary;
 /**
  * Clase que representa el motor de deliveración.
  * 
@@ -36,7 +35,6 @@ public class MotorDeliberacion {
      * 
      */
     public MotorDeliberacion() {
-        //TODO: Inicializar el árbol de debate y las estructuras correspondientes.
         arbol= new Arbol<Opinion>();
         pilaOperaciones = new PilaConArreglo<Operaciones>();
         opinionesPorId = new Mapeo<String,Position<Opinion>>();
@@ -56,7 +54,6 @@ public class MotorDeliberacion {
      * @throws IllegalArgumentException si la operación es nula o vacía.
      */
     public void registrarOperacion(int operacion, String detalle, String idArgumento) {
-        //TODO: Implementar el registro de la operación en la estructura correspondiente.
         if (detalle == null || detalle.trim().isEmpty() || idArgumento == null || idArgumento.trim().isEmpty()) 
             throw new IllegalArgumentException("Los datos de la operación son inválidos.");
         if (operacion < 1 || operacion > 3) 
